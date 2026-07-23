@@ -2,6 +2,7 @@ package com.khazoda.basicweapons;
 
 import com.khazoda.basicweapons.registry.MainRegistry;
 import com.khazoda.basicweapons.registry.TabRegistry;
+import com.khazoda.core.config.KhazConfigSyncNeoForge;
 import com.khazoda.core.reg.KhazRegNeoForge;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -11,6 +12,7 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 public class BasicWeaponsNeoForge {
   public BasicWeaponsNeoForge(IEventBus eventBus) {
     BasicWeaponsCommon.init();
+    KhazConfigSyncNeoForge.registerPayloadHandlers(eventBus, Constants.CONFIG_SYNC);
     KhazRegNeoForge.init(eventBus, MainRegistry::init);
     BasicWeaponsCommon.postRegister();
     eventBus.addListener(this::onBuildCreativeModeTabContents);
