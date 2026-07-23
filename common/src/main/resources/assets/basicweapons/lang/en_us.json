@@ -79,5 +79,7 @@
   "item.basicweapons.bronze_pike": "Bronze Pike",
   "item.basicweapons.golden_pike": "Golden Pike",
   "item.basicweapons.diamond_pike": "Diamond Pike",
-  "item.basicweapons.netherite_pike": "Netherite Pike"
+  "item.basicweapons.netherite_pike": "Netherite Pike",
+  "config.basicweapons.enable_loot_table_population": "Vanilla Loot Table Population",
+  "config.basicweapons.enable_mob_weapon_equipment": "Mob Weapon Equipment"
 }
