@@ -1,0 +1,15 @@
+package com.khazoda.basicweapons.datagen;
+
+import com.khazoda.basicweapons.datagen.advancements.BasicWeaponsAdvancementsProvider;
+import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+
+public class BasicWeaponsDataGenerator implements DataGeneratorEntrypoint {
+  @Override
+  public void onInitializeDataGenerator(FabricDataGenerator generator) {
+    FabricDataGenerator.Pack pack = generator.createPack();
+    pack.addProvider(BasicWeaponsAdvancementsProvider::new);
+    pack.addProvider(BasicWeaponsModelProvider::new);
+    pack.addProvider(BasicWeaponsRecipeProvider::new);
+  }
+}

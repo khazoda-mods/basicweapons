@@ -1,0 +1,20 @@
+{
+  "replace": false,
+  "values": [
+    "basicweapons:wooden_glaive",
+    "basicweapons:stone_glaive",
+    "basicweapons:copper_glaive",
+    "basicweapons:iron_glaive",
+    "basicweapons:golden_glaive",
+    "basicweapons:diamond_glaive",
+    "basicweapons:netherite_glaive",
+    {
+      "id": "basicweapons:bronze_glaive",
+      "required": false
+    },
+    {
+      "id": "basicweapons:tin_glaive",
+      "required": false
+    }
+  ]
+}

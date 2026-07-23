@@ -1,0 +1,52 @@
+package com.khazoda.basicweapons.item;
+
+import com.khazoda.basicweapons.mixinutils.PlayerEntityAccessor;
+import com.khazoda.basicweapons.registry.TagRegistry;
+import com.khazoda.basicweapons.utils.AllowDenyPass;
+import net.minecraft.core.Holder;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.ToolMaterial;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.phys.Vec3;
+
+public class HammerItem extends BasicWeaponSweeplessItem {
+  public HammerItem(ToolMaterial material, float attackDamage, float attackSpeed, double reach, Item.Properties properties) {
+    super(material, BlockTags.AIR, attackDamage, attackSpeed, reach, properties);
+  }
+
+  @Override
+  public void hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+    /* f2 always true for mob attacks, only true if full cooldown for player attacks */
+    float f2 = 1F;
+    if (attacker instanceof Player player) {
+      f2 = ((PlayerEntityAccessor) player).bw$getLastAttackStrength();
+    }
+    if (f2 >= 0.9F) {
+      if (target.isAlwaysTicking()) {
+        Vec3 currentMovement = target.getDeltaMovement();
+        target.setDeltaMovement(currentMovement.x, currentMovement.y + 0.8, currentMovement.z);
+        target.hurtMarked = true;
+      } else {
+        target.push(0, 0.45, 0);
+      }
+    }
+    stack.hurtAndBreak(1, attacker, EquipmentSlot.MAINHAND);
+  }
+
+  @Override
+  public AllowDenyPass bw$canEnchant(ItemStack itemstack, Holder<Enchantment> enchantment) {
+    // The item can't be enchanted by enchantments listed here
+    return enchantment.is(TagRegistry.SHARPNESS_ENCHANTABLE) || enchantment.is(TagRegistry.SWEEPING_EDGE_ENCHANTABLE) ? AllowDenyPass.DENY : AllowDenyPass.PASS;
+  }
+
+  @Override
+  public ItemUseAnimation getUseAnimation(ItemStack stack) {
+    return ItemUseAnimation.SPYGLASS;
+  }
+}

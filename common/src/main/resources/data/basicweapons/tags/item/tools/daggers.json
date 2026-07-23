@@ -1,0 +1,20 @@
+{
+  "replace": false,
+  "values": [
+    "basicweapons:wooden_dagger",
+    "basicweapons:stone_dagger",
+    "basicweapons:copper_dagger",
+    "basicweapons:iron_dagger",
+    "basicweapons:golden_dagger",
+    "basicweapons:diamond_dagger",
+    "basicweapons:netherite_dagger",
+    {
+      "id": "basicweapons:bronze_dagger",
+      "required": false
+    },
+    {
+      "id": "basicweapons:tin_dagger",
+      "required": false
+    }
+  ]
+}
