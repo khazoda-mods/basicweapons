@@ -14,7 +14,7 @@ public class CustomSwordItem extends BasicWeaponItem {
   }
 
   @Override
-  public AllowDenyPass bw$canEnchant(ItemStack itemstack, Holder<Enchantment> enchantment) {
+  public AllowDenyPass getEnchantability(ItemStack itemstack, Holder<Enchantment> enchantment) {
     // The item can't be enchanted by enchantments listed here
     return enchantment.is(TagRegistry.MIGHT_ENCHANTABLE) ? AllowDenyPass.DENY : AllowDenyPass.PASS;
   }

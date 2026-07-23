@@ -1,12 +1,16 @@
 package com.khazoda.basicweapons.platform;
 
+import com.khazoda.basicweapons.Constants;
 import com.khazoda.basicweapons.platform.services.IPlatformHelper;
+import com.khazoda.core.config.KhazConfig;
+import com.khazoda.core.config.KhazConfigSyncNeoForge;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.fml.util.thread.EffectiveSide;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
@@ -27,6 +31,16 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
   @Override
   public boolean isDevelopmentEnvironment() {
     return !FMLLoader.getCurrent().isProduction();
+  }
+
+  @Override
+  public Path getConfigDirectory() {
+    return FMLPaths.CONFIGDIR.get();
+  }
+
+  @Override
+  public void registerServerConfigSync(KhazConfig config) {
+    KhazConfigSyncNeoForge.registerServerConfigSync(config, Constants.CONFIG_SYNC);
   }
 
   @Override

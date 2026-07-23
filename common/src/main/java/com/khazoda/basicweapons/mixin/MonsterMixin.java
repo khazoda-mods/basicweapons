@@ -1,5 +1,6 @@
 package com.khazoda.basicweapons.mixin;
 
+import com.khazoda.basicweapons.BasicWeaponsConfig;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
@@ -38,6 +39,8 @@ public abstract class MonsterMixin {
 
   @Inject(method = "populateDefaultEquipmentSlots", at = @At("TAIL"))
   protected void injectWeaponsWhenSpawning(RandomSource r, DifficultyInstance d, CallbackInfo ci) {
+    if (!BasicWeaponsConfig.mobWeaponEquipmentEnabled()) return;
+
     if (bw$IRON_WEAPONS == null) bw$IRON_WEAPONS = bw$getWeapons("iron_dagger", "iron_hammer", "iron_club");
     if (bw$GOLDEN_WEAPONS == null) bw$GOLDEN_WEAPONS = bw$getWeapons("golden_dagger", "golden_hammer", "golden_club");
 

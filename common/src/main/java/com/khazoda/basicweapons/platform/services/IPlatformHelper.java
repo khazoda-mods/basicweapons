@@ -1,9 +1,11 @@
 package com.khazoda.basicweapons.platform.services;
 
+import com.khazoda.core.config.KhazConfig;
 import net.minecraft.core.RegistryAccess;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.File;
+import java.nio.file.Path;
 
 public interface IPlatformHelper {
 
@@ -28,6 +30,10 @@ public interface IPlatformHelper {
    * @return True if in a development environment, false otherwise.
    */
   boolean isDevelopmentEnvironment();
+
+  Path getConfigDirectory();
+
+  void registerServerConfigSync(KhazConfig config);
 
   /**
    * Gets the name of the environment type as a string.

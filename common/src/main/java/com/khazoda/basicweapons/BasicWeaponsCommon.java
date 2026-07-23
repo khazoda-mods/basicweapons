@@ -9,6 +9,7 @@ public class BasicWeaponsCommon {
   public final static boolean bronze_mod_loaded = Services.PLATFORM.isModLoaded("bronze");
 
   public static void init() {
+    BasicWeaponsConfig.init();
     MaterialPackLoader.loadPacks();
 
     if (Services.PLATFORM.isModLoaded("basicweapons"))

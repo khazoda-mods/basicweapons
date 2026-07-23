@@ -17,14 +17,15 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 @Mixin(ServerPacksSource.class)
 public class ServerPacksSourceMixin {
   @ModifyArg(
-      method = "createPackRepository",
+      method = "createPackRepository(Ljava/nio/file/Path;Lnet/minecraft/world/level/validation/DirectoryValidator;)Lnet/minecraft/server/packs/repository/PackRepository;",
       at = @At(
           value = "INVOKE",
           target = "Lnet/minecraft/server/packs/repository/PackRepository;<init>([Lnet/minecraft/server/packs/repository/RepositorySource;)V"
-      )
+      ),
+      index = 0
   )
   private static RepositorySource[] addMaterialDataPackFinder(RepositorySource[] original) {
     ResourceAndDatapackCustomLoader finder = new ResourceAndDatapackCustomLoader(PackType.SERVER_DATA, true);
     return ArrayUtils.add(original, finder);
   }
-} 
+}

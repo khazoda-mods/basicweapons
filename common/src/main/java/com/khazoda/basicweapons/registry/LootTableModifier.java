@@ -1,5 +1,6 @@
 package com.khazoda.basicweapons.registry;
 
+import com.khazoda.basicweapons.BasicWeaponsConfig;
 import com.khazoda.basicweapons.item.SpearItem;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -50,12 +51,15 @@ public class LootTableModifier {
     LOOT_TABLE_CONFIGS.put(END_CITY_TREASURE, new LootConfig(WeaponRegistry.getItemsByMaterial(ToolMaterial.DIAMOND), false, true));
   }
 
-  public static void modifyLootTable(Identifier id, LootTable.Builder tableBuilder) {
+  public static boolean modifyLootTable(Identifier id, LootTable.Builder tableBuilder) {
+    if (!BasicWeaponsConfig.lootTablePopulationEnabled()) return false;
+
     ResourceKey<LootTable> key = ResourceKey.create(LOOT_TABLE, id);
     LootConfig config = LOOT_TABLE_CONFIGS.get(key);
-    if (config != null) {
-      addLootToTable(config, tableBuilder);
-    }
+    if (config == null) return false;
+
+    addLootToTable(config, tableBuilder);
+    return true;
   }
 
   private static void addLootToTable(LootConfig config, LootTable.Builder tableBuilder) {
@@ -95,4 +99,4 @@ public class LootTableModifier {
 
   private record LootConfig(List<Item> items, boolean applyDamage, boolean enchanted) {
   }
-} 
+}

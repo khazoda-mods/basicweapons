@@ -8,5 +8,10 @@ public class FabricEventManager {
     ServerLifecycleEvents.SERVER_STARTING.register((minecraftServer) -> {
       FabricPlatformHelper.currentMinecraftServer = minecraftServer;
     });
+    ServerLifecycleEvents.SERVER_STOPPED.register((minecraftServer) -> {
+      if (FabricPlatformHelper.currentMinecraftServer == minecraftServer) {
+        FabricPlatformHelper.currentMinecraftServer = null;
+      }
+    });
   }
 }

@@ -1,6 +1,6 @@
 package com.khazoda.basicweapons.item;
 
-import com.khazoda.basicweapons.platform.ItemExtension;
+import com.khazoda.basicweapons.platform.WeaponEnchantability;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlotGroup;
@@ -13,10 +13,9 @@ import net.minecraft.world.item.component.Weapon;
 import net.minecraft.world.level.block.Block;
 
 import static com.khazoda.basicweapons.BasicWeaponsCommon.bettercombat_mod_loaded;
-import static com.khazoda.basicweapons.Constants.ID;
 import static com.khazoda.basicweapons.Constants.PLAYER_ENTITY_INTERACTION_RANGE_MODIFIER_ID;
 
-public abstract class BasicWeaponItem extends Item implements ItemExtension {
+public abstract class BasicWeaponItem extends Item implements WeaponEnchantability {
 
   /* For blunt weapons */
   public BasicWeaponItem(ToolMaterial material, TagKey<Block> effectiveBlocks, float attackDamage, float attackSpeed, double extraReach, Properties properties) {
@@ -50,7 +49,7 @@ public abstract class BasicWeaponItem extends Item implements ItemExtension {
     if (!bettercombat_mod_loaded) {
       builder.add(Attributes.ENTITY_INTERACTION_RANGE,
           new AttributeModifier(
-              ID(PLAYER_ENTITY_INTERACTION_RANGE_MODIFIER_ID),
+              PLAYER_ENTITY_INTERACTION_RANGE_MODIFIER_ID,
               reach,
               AttributeModifier.Operation.ADD_VALUE),
           EquipmentSlotGroup.MAINHAND);

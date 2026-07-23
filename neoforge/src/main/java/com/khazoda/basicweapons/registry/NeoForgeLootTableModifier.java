@@ -18,7 +18,8 @@ public class NeoForgeLootTableModifier {
   public static void onLootTableLoad(LootTableLoadEvent event) {
     if (!event.getName().getNamespace().equals("minecraft")) return;
     LootTable.Builder builder = LootTable.lootTable();
-    LootTableModifier.modifyLootTable(event.getName(), builder);
+    if (!LootTableModifier.modifyLootTable(event.getName(), builder)) return;
+
     LootPool pool = LootPool.lootPool()
         .add(NestedLootTable.inlineLootTable(builder.build()))
         .build();

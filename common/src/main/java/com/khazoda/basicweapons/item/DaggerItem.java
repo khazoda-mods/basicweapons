@@ -15,7 +15,7 @@ public class DaggerItem extends BasicWeaponSweeplessItem {
   }
 
   @Override
-  public AllowDenyPass bw$canEnchant(ItemStack itemstack, Holder<Enchantment> enchantment) {
+  public AllowDenyPass getEnchantability(ItemStack itemstack, Holder<Enchantment> enchantment) {
     // The item can't be enchanted by enchantments listed here
     return enchantment.is(TagRegistry.MIGHT_ENCHANTABLE) || enchantment.is(TagRegistry.SWEEPING_EDGE_ENCHANTABLE) ? AllowDenyPass.DENY : AllowDenyPass.PASS;
   }

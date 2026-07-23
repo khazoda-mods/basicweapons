@@ -1,6 +1,6 @@
 package com.khazoda.basicweapons.item;
 
-import com.khazoda.basicweapons.platform.ItemExtension;
+import com.khazoda.basicweapons.platform.WeaponEnchantability;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -8,7 +8,7 @@ import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.item.component.Weapon;
 import net.minecraft.world.level.block.Block;
 
-public abstract class BasicWeaponSweeplessItem extends Item implements ItemExtension {
+public abstract class BasicWeaponSweeplessItem extends Item implements WeaponEnchantability {
 
   /* For blunt weapons */
   public BasicWeaponSweeplessItem(ToolMaterial material, TagKey<Block> effectiveBlocks, float attackDamage, float attackSpeed, double extraReach, Properties properties) {

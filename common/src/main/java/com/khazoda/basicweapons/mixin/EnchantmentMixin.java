@@ -1,7 +1,7 @@
 package com.khazoda.basicweapons.mixin;
 
-import com.khazoda.basicweapons.platform.ItemExtension;
 import com.khazoda.basicweapons.platform.Services;
+import com.khazoda.basicweapons.platform.WeaponEnchantability;
 import com.khazoda.basicweapons.utils.AllowDenyPass;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -34,17 +34,17 @@ public class EnchantmentMixin {
     bw$resolveEnchantability(itemStack, cir, false);
   }
 
-  // Resolves enchantability by delegating to each weapon's bw$canEnchant deny-list in their respective classes
+  // Resolves enchantability by delegating to each weapon's allow/deny list
   @Unique
   private void bw$resolveEnchantability(ItemStack itemStack, CallbackInfoReturnable<Boolean> cir, boolean promoteSupported) {
-    if (itemStack.getItem() instanceof ItemExtension itemExtension) {
+    if (itemStack.getItem() instanceof WeaponEnchantability weaponEnchantability) {
       Enchantment enchantment = (Enchantment) (Object) this;
 
       Services.PLATFORM.getCurrentRegistryAccess().lookup(Registries.ENCHANTMENT).ifPresent(enchantmentRegistry -> {
         enchantmentRegistry.getResourceKey(enchantment).ifPresent(resourceKey -> {
           Holder<Enchantment> enchantmentHolder = enchantmentRegistry.getOrThrow(resourceKey);
 
-          AllowDenyPass result = itemExtension.bw$canEnchant(itemStack, enchantmentHolder);
+          AllowDenyPass result = weaponEnchantability.getEnchantability(itemStack, enchantmentHolder);
           if (result == AllowDenyPass.DENY) {
             cir.setReturnValue(false);
           } else if (result == AllowDenyPass.ALLOW) {
