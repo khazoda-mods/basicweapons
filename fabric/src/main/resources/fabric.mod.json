@@ -1,44 +1,48 @@
 {
-    "schemaVersion": 1,
-    "id": "${mod_id}",
-    "version": "${version}",
-    "name": "${mod_name}",
-    "description": "${description}",
-    "authors": [
-        "${mod_author}"
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "${mod_name}",
+  "description": "${description}",
+  "icon": "assets/${mod_id}/icon.png",
+  "authors": [
+    "${mod_author}"
+  ],
+  "contributors": [],
+  "contact": {
+    "homepage": "${mod_homepage}",
+    "sources": "${mod_sources}",
+    "issues": "${mod_issues}"
+  },
+  "license": "${license}",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.khazoda.basicweapons.BasicWeaponsFabric"
     ],
-    "contributors": [],
-    "contact": {
-        "homepage": "${homepage_url}",
-        "sources": "${sources_url}",
-        "issues": "${issues_url}"
+    "fabric-datagen": [
+      "com.khazoda.basicweapons.datagen.BasicWeaponsDataGenerator"
+    ]
+  },
+  "mixins": [
+    "${mod_id}.mixins.json", "${mod_id}.fabric.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${fabric_loader_version}",
+    "fabric-api": "*",
+    "minecraft": "~${minecraft_version}",
+    "java": ">=${java_version}",
+    "khazodacore": ">=${khazodacore_version}"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.com/invite/vEZUkSxwR9"
+      }
     },
-    "license": "${license}",
-    "icon": "${mod_icon}",
-    "environment": "*",
-    "entrypoints": {
-        "main": [
-            "com.example.examplemod.ExampleModFabric"
-        ],
-        "client": [
-            "com.example.examplemod.platform.FabricConfigSyncClient"
-        ],
-        "fabric-datagen": [
-            "com.example.examplemod.datagen.ExampleModDataGenerator"
-        ]
-    },
-    "mixins": [
-        "${mod_id}.mixins.json",
-        "${mod_id}.fabric.mixins.json"
-    ],
-    "depends": {
-        "fabricloader": ">=${fabric_loader_version}",
-        "fabric-api": "*",
-        "minecraft": "~${minecraft_version}",
-        "java": ">=${java_version}"
-    },
-    "suggests": {
-        "another-mod": "*"
+    "catalogue": {
+      "banner": "assets/${mod_id}/banner.png",
+      "background": "assets/${mod_id}/background.png"
     }
+  }
 }
-  

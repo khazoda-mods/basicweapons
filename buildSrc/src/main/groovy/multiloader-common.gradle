@@ -14,6 +14,8 @@ java {
 }
 
 repositories {
+    /* always temporarily comment out next line if building jars */
+    mavenLocal()
     mavenCentral()
     // https://docs.gradle.org/current/userguide/declaring_repositories.html#declaring_content_exclusively_found_in_one_repository
     exclusiveContent {
@@ -28,6 +30,10 @@ repositories {
     maven {
         name = 'BlameJared'
         url = 'https://maven.blamejared.com'
+    }
+    maven {
+        name = 'Khazoda'
+        url = 'https://maven.khazoda.com/releases'
     }
 }
 
@@ -63,15 +69,15 @@ processResources {
             'minecraft_version_range'      : minecraft_version_range,
             'fabric_version'               : fabric_version,
             'fabric_loader_version'        : fabric_loader_version,
+            'khazodacore_version'          : khazodacore_version,
             'mod_name'                     : mod_name,
             'mod_author'                   : mod_author,
             'mod_id'                       : mod_id,
-            'mod_icon'                     : mod_icon,
             'license'                      : license,
             'description'                  : project.description,
-            'homepage_url'                 : homepage_url,
-            'sources_url'                  : sources_url,
-            'issues_url'                   : issues_url,
+            'mod_homepage'                 : mod_homepage,
+            'mod_sources'                  : mod_sources,
+            'mod_issues'                   : mod_issues,
             'neoforge_version'             : neoforge_version,
             'neoforge_loader_version_range': neoforge_loader_version_range,
             'java_version'                 : java_version

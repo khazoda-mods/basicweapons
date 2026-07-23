@@ -6,6 +6,7 @@ dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     implementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    implementation "com.khazoda:khazodacore-fabric:${khazodacore_version}"
 }
 
 loom {
@@ -40,17 +41,17 @@ fabricApi.configureDataGeneration {
 def exportRoot = rootProject.layout.projectDirectory.dir('export')
 
 tasks.named('jar') {
-    archiveFileName.set("${mod_id}-fabric-${project.version}+${minecraft_version}.jar")
+    archiveFileName.set("${mod_id}-fabric-${project.version}.jar")
     destinationDirectory.set(exportRoot)
 }
 
 tasks.named('sourcesJar') {
-    archiveFileName.set("${mod_id}-fabric-${project.version}+${minecraft_version}-sources.jar")
+    archiveFileName.set("${mod_id}-fabric-${project.version}-sources.jar")
     destinationDirectory.set(exportRoot.dir('source'))
 }
 
 tasks.named('javadocJar') {
-    archiveFileName.set("${mod_id}-fabric-${project.version}+${minecraft_version}-javadoc.jar")
+    archiveFileName.set("${mod_id}-fabric-${project.version}-javadoc.jar")
     destinationDirectory.set(exportRoot.dir('javadoc'))
 }
 
