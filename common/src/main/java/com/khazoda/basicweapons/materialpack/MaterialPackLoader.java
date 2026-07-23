@@ -30,11 +30,11 @@ import static com.khazoda.basicweapons.materialpack.MaterialPackConstants.*;
 
 public class MaterialPackLoader {
   private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-  public static final Map<String, EarlyLoadedMaterial> loadedMaterials = new HashMap<>();
+  public static final Map<String, EarlyLoadedMaterial> loadedMaterials = new LinkedHashMap<>();
   private static final Map<ToolMaterial, EarlyLoadedMaterial> toolMaterialMap = new HashMap<>();
-  private static final Map<String, String> materialToDatapackName = new HashMap<>();
-  private static final Map<String, File> materialToPackFolder = new HashMap<>();
-  private static final Set<String> initiallyLoadedPacks = new HashSet<>();
+  private static final Map<String, String> materialToDatapackName = new LinkedHashMap<>();
+  private static final Map<String, File> materialToPackFolder = new LinkedHashMap<>();
+  private static final Set<String> initiallyLoadedPacks = new LinkedHashSet<>();
   private static boolean hasInitialized = false;
 
   public static void loadPacks() {
@@ -73,21 +73,19 @@ public class MaterialPackLoader {
     for (File packFile : packFiles) {
       String packName = packFile.getName();
       if (packFile.isDirectory()) {
-        processPackFolder(packFile);
+        processPackFolder(packFile, packName);
       } else {
-        // For ZIP files, extract to a temp directory with the same name before processing
-        File extractDir = new File(materialPacksFolder, packName.substring(0, packName.length() - 4));
+        String logicalPackName = packName.substring(0, packName.length() - 4);
+        Path extractDir = null;
         try {
-          if (extractDir.exists()) {
-            FileUtils.deleteDirectory(extractDir); // Clean up any previous extraction just in case
-          }
-          extractZip(packFile, extractDir);
-          processPackFolder(extractDir);
+          extractDir = Files.createTempDirectory("basicweapons-materialpack-");
+          extractZip(packFile, extractDir.toFile());
+          processPackFolder(extractDir.toFile(), logicalPackName);
         } catch (IOException e) {
           Constants.LOG.error("Failed to process ZIP pack {}: {}.", packName, e.getMessage());
         } finally {
           try {
-            if (extractDir.exists()) FileUtils.deleteDirectory(extractDir);
+            if (extractDir != null) FileUtils.deleteDirectory(extractDir.toFile());
           } catch (IOException e) {
             Constants.LOG.warn("Failed to remove temporary extraction folder for {}: {}", packName, e.getMessage());
           }
@@ -98,11 +96,19 @@ public class MaterialPackLoader {
     hasInitialized = true;
   }
 
-  private static void processPackFolder(File packFolder) {
-    if (!loadMaterialsFromPack(packFolder)) return;
-    copyPackContent(packFolder, ASSETS_PATH, RESOURCEPACK_TARGET);
-    copyPackContent(packFolder, DATA_PATH, DATAPACK_TARGET);
-    initiallyLoadedPacks.add(packFolder.getName());
+  private static void processPackFolder(File packFolder, String packName) {
+    if (initiallyLoadedPacks.contains(packName)) {
+      Constants.LOG.warn("Skipping material pack {} because another source with the same name was already loaded", packName);
+      return;
+    }
+
+    Optional<List<ValidatedMaterial>> validatedMaterials = validateMaterialsFromPack(packFolder, packName);
+    if (validatedMaterials.isEmpty()) return;
+
+    commitMaterials(packFolder, packName, validatedMaterials.get());
+    copyPackContent(packFolder, packName, ASSETS_PATH, RESOURCEPACK_TARGET);
+    copyPackContent(packFolder, packName, DATA_PATH, DATAPACK_TARGET);
+    initiallyLoadedPacks.add(packName);
   }
 
   private static void extractZip(File zipFile, File targetDir) throws IOException {
@@ -129,14 +135,14 @@ public class MaterialPackLoader {
     }
   }
 
-  private static void copyPackContent(File packFolder, String subPath, String targetRootPath) {
+  private static void copyPackContent(File packFolder, String packName, String subPath, String targetRootPath) {
     File sourceFolder = new File(packFolder, subPath);
     if (!sourceFolder.exists()) return;
 
     File targetRootFolder = new File(targetRootPath);
     createFolder(targetRootFolder);
 
-    File targetFolder = new File(targetRootFolder, packFolder.getName());
+    File targetFolder = new File(targetRootFolder, packName);
     try {
       File[] contents = sourceFolder.listFiles(file -> !file.getName().equals("pack.mcmeta"));
       if (contents != null) {
@@ -160,10 +166,10 @@ public class MaterialPackLoader {
       if (sourcePackMcmeta.exists()) {
         FileUtils.copyFile(sourcePackMcmeta, new File(targetFolder, "pack.mcmeta"));
       } else {
-        Constants.LOG.warn("No pack.mcmeta found in {} folder for {}", subPath, packFolder.getName());
+        Constants.LOG.warn("No pack.mcmeta found in {} folder for {}", subPath, packName);
       }
     } catch (IOException e) {
-      Constants.LOG.error("Failed to copy pack content from {}: {}", packFolder.getName(), e.getMessage());
+      Constants.LOG.error("Failed to copy pack content from {}: {}", packName, e.getMessage());
     }
   }
 
@@ -206,9 +212,7 @@ public class MaterialPackLoader {
   }
 
 
-  /* Returns false if materialpack shouldn't be loaded (loading_requirements.json).
-   * This will skip resource and datapack injection for that materialpack */
-  private static boolean loadMaterialsFromPack(File packFolder) {
+  private static Optional<List<ValidatedMaterial>> validateMaterialsFromPack(File packFolder, String packName) {
     // Check materialpack loading requirements first
     File requirementsFile = new File(packFolder, "loading_requirements.json");
     if (requirementsFile.exists()) {
@@ -217,40 +221,44 @@ public class MaterialPackLoader {
         if (json.has("requires_mod")) {
           String requiredMod = json.get("requires_mod").getAsString();
           if (!requiredMod.isEmpty() && !Services.PLATFORM.isModLoaded(requiredMod)) {
-            Constants.LOG.info("Skipping material pack {} - required mod {} is not loaded", packFolder.getName(), requiredMod);
-            return false;
+            Constants.LOG.info("Skipping material pack {} - required mod {} is not loaded", packName, requiredMod);
+            return Optional.empty();
           }
         }
       } catch (Exception e) {
-        Constants.LOG.error("Failed to read loading requirements for pack {}: {}. It won't be enabled.", packFolder.getName(), e.getMessage());
-        return false;
+        Constants.LOG.error("Failed to read loading requirements for pack {}: {}. It won't be enabled.", packName, e.getMessage());
+        return Optional.empty();
       }
     }
 
-    // Check if any materials exist (they should)
     File materialFolder = new File(packFolder, CUSTOM_MATERIALS_PATH);
     if (!materialFolder.exists()) {
-      Constants.LOG.warn("Pack {} does not contain materials at expected path", packFolder.getName());
-      return false;
+      Constants.LOG.warn("Pack {} does not contain materials at expected path", packName);
+      return Optional.empty();
     }
     File[] materialFiles = materialFolder.listFiles((dir, name) -> name.endsWith(".json"));
     if (materialFiles == null || materialFiles.length == 0) {
-      Constants.LOG.warn("No material files found in pack {}", packFolder.getName());
-      return false;
+      Constants.LOG.warn("No material files found in pack {}", packName);
+      return Optional.empty();
     }
 
-    // Process each material from this materialpack individually
+    Arrays.sort(materialFiles, Comparator.comparing(File::getName, String.CASE_INSENSITIVE_ORDER).thenComparing(File::getName));
+
+    List<ValidatedMaterial> validatedMaterials = new ArrayList<>(materialFiles.length);
+    Set<String> materialNames = new HashSet<>();
     for (File file : materialFiles) {
       try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
         JsonObject json = GSON.fromJson(reader, JsonObject.class);
 
-        String material_name = json.get("material_name").getAsString();
-        if (material_name.isEmpty() || material_name.indexOf('/') >= 0 || !Identifier.isValidPath(material_name)) {
+        String materialName = json.get("material_name").getAsString();
+        if (materialName.isEmpty() || materialName.indexOf('/') >= 0 || !Identifier.isValidPath(materialName)) {
           throw new IllegalArgumentException("material_name must be a simple lowercase Minecraft path");
         }
-        if (loadedMaterials.containsKey(material_name)) {
-          Constants.LOG.error("Material '{}' is declared by more than one material pack; ignoring duplicate in {}", material_name, packFolder.getName());
-          continue;
+        if (!materialNames.add(materialName)) {
+          throw new IllegalArgumentException("material '" + materialName + "' is declared more than once in this pack");
+        }
+        if (loadedMaterials.containsKey(materialName)) {
+          throw new IllegalArgumentException("material '" + materialName + "' was already declared by an earlier pack");
         }
         int durability = json.get("durability").getAsInt();
         float attack_damage_bonus = json.get("attack_damage_bonus").getAsFloat();
@@ -277,21 +285,34 @@ public class MaterialPackLoader {
         int enchantability = json.get("enchantability").getAsInt();
         String repair_ingredient = json.get("repair_ingredient").getAsString();
 
-        EarlyLoadedMaterial material = new EarlyLoadedMaterial(material_name, durability, attack_damage_bonus, mining_speed, attack_speed_bonus, reach_bonus, enchantability, repair_ingredient);
+        EarlyLoadedMaterial material = new EarlyLoadedMaterial(materialName, durability, attack_damage_bonus, mining_speed, attack_speed_bonus, reach_bonus, enchantability, repair_ingredient);
         ToolMaterial toolMaterial = material.createToolMaterial();
-        toolMaterialMap.put(toolMaterial, material);
-        loadedMaterials.put(material_name, material);
-        materialToDatapackName.put(material_name, packFolder.getName());
-        materialToPackFolder.put(material_name, packFolder);
-        Constants.LOG.info("[{}] material loaded.", material_name);
-        // Constants.LOG.info("Loaded material '{}' from '{}' with stats: [durability '{}'], [attack damage bonus '{}'], [attack speed bonus '{}'], [enchantability '{}'], [repair ingredient '{}']", material_name, packFolder.getName(), durability,attack_damage_bonus, attack_speed_bonus, enchantability,repair_ingredient);
-
-        WeaponRegistry.registerAllWeaponsForMaterialPackMaterial(material_name);
+        validatedMaterials.add(new ValidatedMaterial(materialName, material, toolMaterial));
       } catch (Exception e) {
-        Constants.LOG.error("Failed to load material file {} from pack {}: {}", file.getName(), packFolder.getName(), e.getMessage());
+        Constants.LOG.error("Rejecting material pack {} because {} is invalid: {}", packName, file.getName(), e.getMessage());
+        return Optional.empty();
       }
     }
-    return true;
+    return Optional.of(validatedMaterials);
+  }
+
+  private static void commitMaterials(File packFolder, String packName, List<ValidatedMaterial> validatedMaterials) {
+    for (ValidatedMaterial validatedMaterial : validatedMaterials) {
+      String materialName = validatedMaterial.name();
+      EarlyLoadedMaterial material = validatedMaterial.material();
+      toolMaterialMap.put(validatedMaterial.toolMaterial(), material);
+      loadedMaterials.put(materialName, material);
+      materialToDatapackName.put(materialName, packName);
+      materialToPackFolder.put(materialName, packFolder);
+    }
+
+    for (ValidatedMaterial validatedMaterial : validatedMaterials) {
+      Constants.LOG.info("[{}] material loaded.", validatedMaterial.name());
+      WeaponRegistry.registerAllWeaponsForMaterialPackMaterial(validatedMaterial.name());
+    }
+  }
+
+  private record ValidatedMaterial(String name, EarlyLoadedMaterial material, ToolMaterial toolMaterial) {
   }
 
   public static ToolMaterial getMaterial(String name) {
