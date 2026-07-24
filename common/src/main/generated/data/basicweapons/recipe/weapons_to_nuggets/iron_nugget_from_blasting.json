@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 100,
+  "experience": 0.1,
+  "ingredient": [
+    "basicweapons:iron_dagger",
+    "basicweapons:iron_hammer",
+    "basicweapons:iron_club",
+    "basicweapons:iron_pike",
+    "basicweapons:iron_quarterstaff",
+    "basicweapons:iron_glaive"
+  ],
+  "result": {
+    "id": "minecraft:iron_nugget"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "/": "minecraft:stick",
+    "^": "minecraft:gold_ingot"
+  },
+  "pattern": [
+    "  ^",
+    " ^ ",
+    "/  "
+  ],
+  "result": {
+    "id": "basicweapons:golden_pike"
+  }
+}

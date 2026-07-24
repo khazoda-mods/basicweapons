@@ -1,0 +1,46 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "basicweapons:compat/tin_club"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_tin_club": {
+      "conditions": {
+        "items": [
+          {
+            "items": "basicweapons:tin_club"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_tin_club"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "basicweapons:compat/tin_club"
+    ]
+  },
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "bronze"
+      ]
+    }
+  ],
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "bronze"
+    }
+  ]
+}

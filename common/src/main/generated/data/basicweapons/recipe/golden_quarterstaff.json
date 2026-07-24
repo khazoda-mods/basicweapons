@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "/": "minecraft:stick",
+    "O": "minecraft:gold_ingot"
+  },
+  "pattern": [
+    "  /",
+    " O ",
+    "/  "
+  ],
+  "result": {
+    "id": "basicweapons:golden_quarterstaff"
+  }
+}

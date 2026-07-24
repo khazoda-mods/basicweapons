@@ -1,0 +1,46 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "basicweapons:compat/wooden_dagger_farmersdelight"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_wooden_dagger": {
+      "conditions": {
+        "items": [
+          {
+            "items": "basicweapons:wooden_dagger"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_wooden_dagger"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "basicweapons:compat/wooden_dagger_farmersdelight"
+    ]
+  },
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "farmersdelight"
+      ]
+    }
+  ],
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "farmersdelight"
+    }
+  ]
+}

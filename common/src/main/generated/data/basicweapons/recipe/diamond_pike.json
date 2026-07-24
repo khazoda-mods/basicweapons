@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "/": "minecraft:stick",
+    "^": "minecraft:diamond"
+  },
+  "pattern": [
+    "  ^",
+    " ^ ",
+    "/  "
+  ],
+  "result": {
+    "id": "basicweapons:diamond_pike"
+  }
+}

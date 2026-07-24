@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_golden_club": {
+      "conditions": {
+        "items": [
+          {
+            "items": "basicweapons:golden_club"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "basicweapons:golden_club"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_golden_club"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "basicweapons:golden_club"
+    ]
+  }
+}

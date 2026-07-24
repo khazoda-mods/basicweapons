@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_iron_pike": {
+      "conditions": {
+        "items": [
+          {
+            "items": "basicweapons:iron_pike"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "basicweapons:iron_pike"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_iron_pike"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "basicweapons:iron_pike"
+    ]
+  }
+}

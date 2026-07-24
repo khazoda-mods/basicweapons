@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "/": "minecraft:stick",
+    "^": "minecraft:iron_ingot"
+  },
+  "pattern": [
+    "  ^",
+    " ^ ",
+    "/  "
+  ],
+  "result": {
+    "id": "basicweapons:iron_pike"
+  }
+}

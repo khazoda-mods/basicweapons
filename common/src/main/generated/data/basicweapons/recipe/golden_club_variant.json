@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "group": "golden_club",
+  "key": {
+    "#": "minecraft:gold_ingot",
+    "/": "minecraft:stick"
+  },
+  "pattern": [
+    "# ",
+    " #",
+    " /"
+  ],
+  "result": {
+    "id": "basicweapons:golden_club"
+  }
+}

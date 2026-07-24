@@ -4,6 +4,11 @@ import com.khazoda.basicweapons.material.ConditionalToolMaterials;
 import com.khazoda.basicweapons.materialpack.MaterialPackLoader;
 import com.khazoda.basicweapons.struct.WeaponType;
 import com.khazoda.core.reg.KhazReg.Entry;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ToolMaterial;
 
@@ -43,13 +48,18 @@ public class WeaponRegistry {
   );
 
   public static void init() {
+    boolean runningDatagen = isDataGenerationEnabled();
     for (MaterialEntry material : VANILLA_MATERIALS) {
       registerAllWeaponsForMaterial(material);
     }
-    if (bronze_mod_loaded) { //TODO: Make sure you comment this when running DATAGEN
+    if (bronze_mod_loaded || runningDatagen) {
       for (MaterialEntry material : COMPAT_MATERIALS) {
         registerAllWeaponsForMaterial(material);
       }
+    }
+    if (runningDatagen) {
+      registerDatagenPlaceholder("bronze:bronze_nugget");
+      registerDatagenPlaceholder("bronze:tin_nugget");
     }
   }
 
@@ -137,5 +147,18 @@ public class WeaponRegistry {
     public MaterialEntry(ToolMaterial material, String prefix) {
       this(material, prefix, settings -> settings);
     }
+  }
+
+  // datagen
+  private static boolean isDataGenerationEnabled() {
+    return System.getProperty("fabric-api.datagen") != null;
+  }
+
+  // dummy entries for tin & bronze nuggets so that datagen can work
+  private static void registerDatagenPlaceholder(String id) {
+    Identifier identifier = Identifier.parse(id);
+    if (BuiltInRegistries.ITEM.containsKey(identifier)) return;
+    ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, identifier);
+    Registry.register(BuiltInRegistries.ITEM, key, new Item(new Item.Properties().setId(key)));
   }
 }

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "basicweapons:wooden_club_variant"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_wooden_club": {
+      "conditions": {
+        "items": [
+          {
+            "items": "basicweapons:wooden_club"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_wooden_club"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "basicweapons:wooden_club_variant"
+    ]
+  }
+}

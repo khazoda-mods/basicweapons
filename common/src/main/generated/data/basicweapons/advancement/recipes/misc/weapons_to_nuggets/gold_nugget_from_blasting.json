@@ -1,0 +1,39 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_golden_weapon": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "basicweapons:golden_dagger",
+              "basicweapons:golden_hammer",
+              "basicweapons:golden_club",
+              "basicweapons:golden_pike",
+              "basicweapons:golden_quarterstaff",
+              "basicweapons:golden_glaive"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "basicweapons:weapons_to_nuggets/gold_nugget_from_blasting"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_golden_weapon"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "basicweapons:weapons_to_nuggets/gold_nugget_from_blasting"
+    ]
+  }
+}

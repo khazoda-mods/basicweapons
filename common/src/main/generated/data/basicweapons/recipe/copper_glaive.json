@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "/": "minecraft:stick",
+    "O": "minecraft:copper_ingot"
+  },
+  "pattern": [
+    " OO",
+    "O/ ",
+    "/  "
+  ],
+  "result": {
+    "id": "basicweapons:copper_glaive"
+  }
+}

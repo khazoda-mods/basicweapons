@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "group": "stone_club",
+  "key": {
+    "#": "#minecraft:stone_tool_materials",
+    "/": "minecraft:stick"
+  },
+  "pattern": [
+    "# ",
+    " #",
+    " /"
+  ],
+  "result": {
+    "id": "basicweapons:stone_club"
+  }
+}
