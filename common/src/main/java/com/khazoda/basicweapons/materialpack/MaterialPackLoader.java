@@ -16,9 +16,9 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -47,8 +47,6 @@ public class MaterialPackLoader {
     }
 
     File materialPacksFolder = new File(MATERIALPACK_SOURCE);
-    File[] packFiles = materialPacksFolder.listFiles(file -> file.isDirectory() || file.getName().toLowerCase(Locale.ROOT).endsWith(".zip"));
-
     if (!materialPacksFolder.exists()) {
       if (materialPacksFolder.mkdir()) {
         Constants.LOG.info("Created material packs folder {}", materialPacksFolder.getName());
@@ -56,16 +54,17 @@ public class MaterialPackLoader {
         Constants.LOG.error("Failed to create basicweapons_materials folder. This should never happen.");
         return;
       }
-    } else {
-      /* Generate bwmp_data and bwmp_resources */
-      File resourcepacksFolder = new File(RESOURCEPACK_TARGET);
-      File datapacksFolder = new File(DATAPACK_TARGET);
-      createFolder(resourcepacksFolder);
-      createFolder(datapacksFolder);
-      cleanTargetFolders(); // On every load the target resource & data folders are cleaned to handle users removing materialpacks
     }
 
-    if (packFiles == null || packFiles.length == 0) {
+    File[] packFiles = materialPacksFolder.listFiles(file -> file.isDirectory() || file.getName().toLowerCase(Locale.ROOT).endsWith(".zip"));
+    if (packFiles == null) {
+      Constants.LOG.error("Failed to read material packs folder {}", materialPacksFolder.getName());
+      return;
+    }
+    if (!cleanTargetFolders()) {
+      throw new IllegalStateException("Failed to clean generated material packs; aborting startup to avoid loading stale custom weapons. Check the target folders' permissions and close programs locking their files.");
+    }
+    if (packFiles.length == 0) {
       Constants.LOG.info("No material packs found in {}", materialPacksFolder.getName());
       hasInitialized = true;
       return;
@@ -84,7 +83,7 @@ public class MaterialPackLoader {
           extractDir = Files.createTempDirectory("basicweapons-materialpack-");
           extractZip(packFile, extractDir.toFile());
           processPackFolder(extractDir.toFile(), logicalPackName);
-        } catch (IOException e) {
+        } catch (IOException | InvalidPathException e) {
           Constants.LOG.error("Failed to process ZIP pack {}: {}.", packName, e.getMessage());
         } finally {
           try {
@@ -95,12 +94,12 @@ public class MaterialPackLoader {
         }
       }
     }
-    Constants.LOG.info("Loaded the following material packs: [{}]", initiallyLoadedPacks.stream().map(Object::toString).collect(Collectors.joining(", ")));
+    Constants.LOG.info("Loaded the following material packs: [{}]", String.join(", ", initiallyLoadedPacks));
     hasInitialized = true;
   }
 
   private static void processPackFolder(File packFolder, String packName) {
-    if (initiallyLoadedPacks.contains(packName)) {
+    if (initiallyLoadedPacks.stream().anyMatch(name -> name.equalsIgnoreCase(packName))) {
       Constants.LOG.warn("Skipping material pack {} because another source with the same name was already loaded", packName);
       return;
     }
@@ -257,6 +256,9 @@ public class MaterialPackLoader {
         if (materialName.isEmpty() || materialName.indexOf('/') >= 0 || !Identifier.isValidPath(materialName)) {
           throw new IllegalArgumentException("material_name must be a simple lowercase Minecraft path");
         }
+        if (WeaponRegistry.isBuiltInMaterialName(materialName)) {
+          throw new IllegalArgumentException("material '" + materialName + "' conflicts with a built-in material");
+        }
         if (!materialNames.add(materialName)) {
           throw new IllegalArgumentException("material '" + materialName + "' is declared more than once in this pack");
         }
@@ -287,6 +289,7 @@ public class MaterialPackLoader {
         float reach_bonus = json.get("reach_bonus").getAsFloat();
         int enchantability = json.get("enchantability").getAsInt();
         String repair_ingredient = json.get("repair_ingredient").getAsString();
+        validateRepairIngredient(repair_ingredient);
 
         if (json.has("fireproof") && !GsonHelper.isBooleanValue(json, "fireproof")) {
           throw new IllegalArgumentException("fireproof must be a boolean");
@@ -369,6 +372,15 @@ public class MaterialPackLoader {
     return material != null ? material.getReachBonus() : 0f;
   }
 
+  private static void validateRepairIngredient(String repairIngredient) {
+    String identifier = repairIngredient.startsWith("#") ? repairIngredient.substring(1) : repairIngredient;
+    try {
+      Identifier.parse(identifier);
+    } catch (RuntimeException e) {
+      throw new IllegalArgumentException("repair_ingredient must be a valid item or item tag identifier");
+    }
+  }
+
   /* Returns true if folder was created, false if not or if it already exists */
   private static boolean createFolder(File folder) {
     if (!folder.exists()) {
@@ -377,23 +389,21 @@ public class MaterialPackLoader {
     return false;
   }
 
-  private static void cleanTargetFolders() {
+  private static boolean cleanTargetFolders() {
     // Clean config/basicweapons/bwmp_resources and config/basicweapons/bwmp_data to make sure materialpacks are always fresh
-    if (!ableToDeleteDirectory(new File(RESOURCEPACK_TARGET)))
-      Constants.LOG.error("Failed to clean bwmp_resources target folder. This is probably fine but if you experience issues please report this on the Basic Weapons issue tracker.");
-    if (!ableToDeleteDirectory(new File(DATAPACK_TARGET)))
-      Constants.LOG.error("Failed to clean bwmp_data target folder. This is probably fine but if you experience issues please report this on the Basic Weapons issue tracker.");
+    boolean resourcesCleaned = ableToDeleteDirectory(new File(RESOURCEPACK_TARGET));
+    boolean dataCleaned = ableToDeleteDirectory(new File(DATAPACK_TARGET));
+    return resourcesCleaned && dataCleaned;
   }
 
   private static boolean ableToDeleteDirectory(File dir) {
-    if (dir.exists()) {
-      try {
-        FileUtils.deleteDirectory(dir);
-        return true;
-      } catch (IOException e) {
-        return false;
-      }
+    if (!dir.exists()) return true;
+    try {
+      FileUtils.deleteDirectory(dir);
+      return true;
+    } catch (IOException e) {
+      Constants.LOG.error("Failed to clean generated material pack folder {}: {}", dir, e.getMessage());
+      return false;
     }
-    return false;
   }
 }

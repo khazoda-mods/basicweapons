@@ -51,14 +51,17 @@ public class WeaponRegistry {
     }
   }
 
+  public static boolean isBuiltInMaterialName(String materialName) {
+    return VANILLA_MATERIALS.stream().anyMatch(material -> material.prefix().equals(materialName)) || ((bronze_mod_loaded || isDataGenerationEnabled()) && COMPAT_MATERIALS.stream().anyMatch(material -> material.prefix().equals(materialName)));
+  }
+
   public static void registerWeaponForMaterial(WeaponTypeInterface type, MaterialEntry material) {
     String itemId = material.prefix() + "_" + type.getId();
     float damageModifier = WeaponType.getDamageModifier(type, material.material());
     float speedModifier = WeaponType.getSpeedModifier(type, material.material());
     float reachModifier = WeaponType.getReachModifier(type, material.material());
 
-    Entry<Item> itemSupplier = MainRegistry.REG.item(itemId, (key, properties) ->
-        type.create(material.material, damageModifier, speedModifier, reachModifier, material.settingsModifier().apply(properties)));
+    Entry<Item> itemSupplier = MainRegistry.REG.item(itemId, (key, properties) -> type.create(material.material, damageModifier, speedModifier, reachModifier, material.settingsModifier().apply(properties)));
 
     ITEMS.put(itemId, itemSupplier);
 
